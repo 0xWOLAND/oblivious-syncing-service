@@ -338,6 +338,7 @@ dependencies = [
  "ark-ec",
  "ark-ff",
  "ark-poly",
+ "ark-serialize",
  "ark-std",
  "lazy_static",
  "rand",
