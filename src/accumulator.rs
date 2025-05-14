@@ -6,7 +6,7 @@ use sha2::{Digest, Sha256};
 use anyhow::Result;
 use ark_serialize::CanonicalSerialize;
 
-use crate::pcs::{commit, POINTS};
+use crate::pcs::{commit, POINTS, open, check};
 
 /// Evaluate poly at v
 fn evaluate_poly(coeffs: &[Fr], v: Fr) -> Fr {
@@ -107,7 +107,18 @@ mod tests {
         
         // Insert roots into accumulator
         let r = Fr::rand(&mut rng);
-        let a_1 = insert(&roots, a_0, r).unwrap();
+        let state = insert(&roots, a_0, r).unwrap();
+        
+        // Verify polynomial consistency
+        let poly = poly_from_roots(&roots);
+        let coeffs = &poly.coeffs;
+        
+        // Open commitment at a random index
+        let test_index = 5;
+        let (v_j, r_j, witness) = open(coeffs, r, test_index).unwrap();
+        
+        // Verify the opening
+        assert!(check(state.Commitment, v_j, witness, POINTS[test_index + 1]));
         
         // Test non-membership for a value not in roots
         let v = Fr::rand(&mut rng);
