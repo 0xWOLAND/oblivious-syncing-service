@@ -94,6 +94,7 @@ mod tests {
     use super::*;
     use ark_ff::UniformRand;
     use rand::thread_rng;
+    use crate::pcs::{open, check};
 
     #[test]
     fn test_accumulator_operations() {
@@ -123,7 +124,14 @@ mod tests {
         // Test non-membership for a value not in roots
         let v = Fr::rand(&mut rng);
         let s_0 = G1Affine::default();
-        let s_1 = check_non_membership(&roots, v, r, s_0).unwrap();
+        let non_mem_state = check_non_membership(&roots, v, r, s_0).expect("Failed to check non-membership");
+        
+        // Verify non-membership proof by checking the commitment
+        let alpha = evaluate_poly(coeffs, v);
+        assert!(!alpha.is_zero(), "Non-root value should not evaluate to zero");
+        
+        // Verify the non-membership commitment matches the polynomial commitment
+        assert_eq!(non_mem_state.Commitment, state.Commitment, "Non-membership commitment should match the original commitment");
         
         // Test that a root value fails non-membership check
         assert!(check_non_membership(&roots, roots[0], r, s_0).is_err());
