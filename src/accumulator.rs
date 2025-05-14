@@ -101,7 +101,7 @@ mod tests {
         let mut rng = thread_rng();
         
         // Create some test roots
-        let roots = (0..20).map(|_| Fr::rand(&mut rng)).collect::<Vec<_>>();
+        let roots = (1..20).map(|_| Fr::rand(&mut rng)).collect::<Vec<_>>();
         
         // Initial accumulator value
         let a_0 = G1Affine::default();

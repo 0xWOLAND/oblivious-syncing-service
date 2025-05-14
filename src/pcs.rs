@@ -13,7 +13,7 @@ type Scalar = Fr;
 type GroupAffine = G1Affine;
 type GroupProjective = G1Projective;
 
-const NUM_POINTS: usize = 20 + 2;
+const NUM_POINTS: usize = 20 + 1;
 const BLINDING_INDEX: usize = 0;
 
 include!(concat!(env!("OUT_DIR"), "/trusted_setup.rs"));
