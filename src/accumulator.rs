@@ -37,8 +37,12 @@ fn hash_points_to_fr(p1: &G1Affine, p2: &G1Affine) -> Fr {
     Fr::from_le_bytes_mod_order(&hash_bytes)
 }
 
+pub struct State {
+    pub Accumulator: G1Affine,
+    pub Commitment: G1Affine,
+}
 
-pub fn insert(roots: &[Fr], a_prev: G1Affine, r: Fr) -> Result<G1Affine> {
+pub fn insert(roots: &[Fr], a_prev: G1Affine, r: Fr) -> Result<State> {
     // Build polynomial with given roots
     let poly = poly_from_roots(roots);
     let coeffs = &poly.coeffs;
@@ -51,10 +55,13 @@ pub fn insert(roots: &[Fr], a_prev: G1Affine, r: Fr) -> Result<G1Affine> {
 
     // Compute A_{i+1} = [h] A_i + P_i
     let next = a_prev * h + p_i;
-    Ok(next.into_affine())
+    Ok(State {
+        Accumulator: next.into_affine(),
+        Commitment: p_i,
+    })
 }
 
-pub fn check_non_membership(roots: &[Fr], v: Fr, r: Fr, s_prev: G1Affine) -> Result<G1Affine> {
+pub fn check_non_membership(roots: &[Fr], v: Fr, r: Fr, s_prev: G1Affine) -> Result<State> {
     // Build polynomial
     let poly = poly_from_roots(roots);
     let coeffs = &poly.coeffs;
@@ -76,7 +83,10 @@ pub fn check_non_membership(roots: &[Fr], v: Fr, r: Fr, s_prev: G1Affine) -> Res
 
     // s_{i+1} = [h'] s_prev + P'_i
     let next = s_prev * h_prime + p_i_prime;
-    Ok(next.into_affine())
+    Ok(State {
+        Accumulator: next.into_affine(),
+        Commitment: p_i,
+    })
 }
 
 #[cfg(test)]
